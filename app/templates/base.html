@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+        MarketPulse
+        {% endblock %}
+    </title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet"
+    >
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="app-shell">
+
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+        <div class="brand">
+
+            <div class="brand-icon">
+
+                <i class="bi bi-graph-up-arrow"></i>
+
+            </div>
+
+            <div>
+
+                <div class="brand-name">
+                    MarketPulse
+                </div>
+
+                <div class="brand-subtitle">
+                    Market Intelligence
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="nav-label">
+            MAIN MENU
+        </div>
+
+
+        <nav class="navigation">
+
+            <a
+                href="{{ url_for('main.dashboard') }}"
+                class="nav-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}"
+            >
+
+                <i class="bi bi-grid-1x2-fill"></i>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('main.stocks_page') }}"
+                class="nav-link {% if request.endpoint == 'main.stocks_page' %}active{% endif %}"
+            >
+
+                <i class="bi bi-bar-chart-fill"></i>
+
+                <span>
+                    Market Watch
+                </span>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('main.analytics') }}"
+                class="nav-link {% if request.endpoint == 'main.analytics' %}active{% endif %}"
+            >
+
+                <i class="bi bi-pie-chart-fill"></i>
+
+                <span>
+                    Analytics
+                </span>
+
+            </a>
+
+        </nav>
+
+
+        <div class="nav-label">
+            DATA
+        </div>
+
+
+        <nav class="navigation">
+
+            <a
+                href="{{ url_for('main.export_csv') }}"
+                class="nav-link"
+            >
+
+                <i class="bi bi-filetype-csv"></i>
+
+                <span>
+                    Export CSV
+                </span>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('main.export_excel') }}"
+                class="nav-link"
+            >
+
+                <i class="bi bi-file-earmark-spreadsheet-fill"></i>
+
+                <span>
+                    Export Excel
+                </span>
+
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="source-card">
+
+                <div class="source-icon">
+
+                    <i class="bi bi-database-check"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        Live Source
+                    </strong>
+
+                    <small>
+                        Yahoo Finance
+                    </small>
+
+                </div>
+
+                <span class="live-dot"></span>
+
+            </div>
+
+
+            <div class="sidebar-footer">
+
+                MarketPulse v1.0
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+
+    <main class="main-content">
+
+
+        <header class="topbar">
+
+
+            <button
+                class="mobile-menu"
+                id="mobileMenu"
+            >
+
+                <i class="bi bi-list"></i>
+
+            </button>
+
+
+            <div class="breadcrumb">
+
+                <span>
+                    Workspace
+                </span>
+
+                <i class="bi bi-chevron-right"></i>
+
+                <strong>
+
+                    {% block breadcrumb %}
+                    Dashboard
+                    {% endblock %}
+
+                </strong>
+
+            </div>
+
+
+            <div class="topbar-actions">
+
+
+                <div class="market-status">
+
+                    <span class="status-dot"></span>
+
+                    Market Data Online
+
+                </div>
+
+
+                <button
+                    class="icon-button"
+                    id="themeToggle"
+                >
+
+                    <i class="bi bi-moon-stars"></i>
+
+                </button>
+
+
+                <div class="profile">
+
+                    <div class="avatar">
+                        MP
+                    </div>
+
+                    <div class="profile-text">
+
+                        <strong>
+                            Analyst
+                        </strong>
+
+                        <span>
+                            Market Desk
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </header>
+
+
+        <section class="page-content">
+
+            {% block content %}
+            {% endblock %}
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+<script>
+
+window.MARKETPULSE = {
+
+    refreshSeconds: 60
+
+};
+
+</script>
+
+
+<script
+    src="{{ url_for('static', filename='js/app.js') }}"
+></script>
+
+
+{% block scripts %}
+{% endblock %}
+
+
+</body>
+
+</html>

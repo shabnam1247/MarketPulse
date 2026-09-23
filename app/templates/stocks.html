@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block title %}
+Market Watch | MarketPulse
+{% endblock %}
+
+{% block breadcrumb %}
+Market Watch
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="page-heading">
+
+    <div>
+
+        <span class="eyebrow">
+            LIVE MARKET DATA
+        </span>
+
+        <h1>
+            Market Watch
+        </h1>
+
+        <p>
+            Search and monitor stock prices
+            from your watchlist.
+        </p>
+
+    </div>
+
+</div>
+
+
+
+<section class="search-panel">
+
+
+    <form
+        method="GET"
+        action="{{ url_for('main.stocks_page') }}"
+        class="search-form"
+    >
+
+
+        <div class="search-box">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                name="symbol"
+                value="{{ search }}"
+                placeholder="Search stock symbol, e.g. AAPL or TSLA"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <button
+            class="primary-button"
+            type="submit"
+        >
+
+            Search Market
+
+        </button>
+
+
+        <a
+            class="secondary-button"
+            href="{{ url_for('main.stocks_page') }}"
+        >
+
+            Reset
+
+        </a>
+
+
+    </form>
+
+
+    <div class="popular-searches">
+
+        <span>
+            Popular:
+        </span>
+
+
+        {% for symbol in [
+            "AAPL",
+            "MSFT",
+            "NVDA",
+            "TSLA",
+            "AMZN"
+        ] %}
+
+
+            <a
+                href="{{ url_for('main.stocks_page', symbol=symbol) }}"
+            >
+
+                {{ symbol }}
+
+            </a>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+</section>
+
+
+
+{% if error %}
+
+
+<div class="alert alert-danger">
+
+    <i class="bi bi-exclamation-triangle"></i>
+
+    {{ error }}
+
+</div>
+
+
+{% endif %}
+
+
+
+<section class="panel">
+
+
+    <div class="panel-header">
+
+
+        <div>
+
+            <span class="eyebrow">
+                STOCK UNIVERSE
+            </span>
+
+            <h2>
+
+                {% if search %}
+                    Search Result
+                {% else %}
+                    Your Watchlist
+                {% endif %}
+
+            </h2>
+
+        </div>
+
+
+        <span class="panel-badge">
+
+            {{ stocks|length }}
+
+            symbols
+
+        </span>
+
+
+    </div>
+
+
+
+    <div class="table-wrapper">
+
+
+        <table class="market-table large-table">
+
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        SYMBOL
+                    </th>
+
+                    <th>
+                        PRICE
+                    </th>
+
+                    <th>
+                        PREVIOUS CLOSE
+                    </th>
+
+                    <th>
+                        CHANGE
+                    </th>
+
+                    <th>
+                        VOLUME
+                    </th>
+
+                    <th>
+                        MARKET CAP
+                    </th>
+
+                    <th></th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for stock in stocks %}
+
+
+                <tr>
+
+
+                    <td>
+
+                        <a
+                            class="symbol-link"
+                            href="{{ url_for('main.stock_detail', symbol=stock.symbol) }}"
+                        >
+
+                            <span class="symbol-avatar">
+
+                                {{ stock.symbol[:2] }}
+
+                            </span>
+
+
+                            <strong>
+
+                                {{ stock.symbol }}
+
+                            </strong>
+
+                        </a>
+
+                    </td>
+
+
+                    <td class="price-cell">
+
+                        {% if stock.price is not none %}
+
+                            ${{ "%.2f"|format(stock.price) }}
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if stock.previous_close is not none %}
+
+                            ${{ "%.2f"|format(stock.previous_close) }}
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+
+                        {% if stock.change_percent is not none %}
+
+
+                            <div class="change-stack">
+
+
+                                <strong
+                                    class="{% if stock.change >= 0 %}positive{% else %}negative{% endif %}"
+                                >
+
+                                    {% if stock.change >= 0 %}
+                                        +
+                                    {% endif %}
+
+                                    {{ "%.2f"|format(stock.change) }}
+
+                                </strong>
+
+
+                                <span
+                                    class="{% if stock.change_percent >= 0 %}positive{% else %}negative{% endif %}"
+                                >
+
+                                    {% if stock.change_percent >= 0 %}
+                                        +
+                                    {% endif %}
+
+                                    {{ "%.2f"|format(stock.change_percent) }}%
+
+                                </span>
+
+
+                            </div>
+
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+
+                    </td>
+
+
+                    <td>
+                        {{ stock.volume }}
+                    </td>
+
+
+                    <td>
+                        {{ stock.market_cap }}
+                    </td>
+
+
+                    <td>
+
+
+                        <a
+                            class="icon-link"
+                            href="{{ url_for('main.stock_detail', symbol=stock.symbol) }}"
+                        >
+
+                            <i class="bi bi-arrow-up-right"></i>
+
+                        </a>
+
+
+                    </td>
+
+
+                </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+</section>
+
+
+{% endblock %}

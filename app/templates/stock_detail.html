@@ -1,0 +1,538 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ stock.symbol }} | MarketPulse
+{% endblock %}
+
+{% block breadcrumb %}
+{{ stock.symbol }} Details
+{% endblock %}
+
+
+{% block content %}
+
+
+{% if error %}
+
+<div class="alert alert-danger">
+
+    <i class="bi bi-exclamation-triangle"></i>
+
+    {{ error }}
+
+</div>
+
+{% endif %}
+
+
+
+<!-- STOCK HERO -->
+
+<div class="stock-hero">
+
+
+    <div class="stock-title">
+
+
+        <div class="big-symbol">
+
+            {{ stock.symbol[:2] }}
+
+        </div>
+
+
+        <div>
+
+            <span class="eyebrow">
+                EQUITY PROFILE
+            </span>
+
+            <h1>
+                {{ stock.symbol }}
+            </h1>
+
+            <p>
+                Market quote and historical
+                price analysis
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="hero-price">
+
+
+        {% if stock.price is not none %}
+
+            <strong>
+                ${{ "%.2f"|format(stock.price) }}
+            </strong>
+
+        {% else %}
+
+            <strong>
+                —
+            </strong>
+
+        {% endif %}
+
+
+        {% if stock.change_percent is not none %}
+
+
+            <span
+                class="{% if stock.change_percent >= 0 %}positive{% else %}negative{% endif %}"
+            >
+
+                {% if stock.change_percent >= 0 %}
+                    +
+                {% endif %}
+
+                {{ "%.2f"|format(stock.change_percent) }}%
+
+            </span>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- DETAIL STATS -->
+
+<div class="detail-stats">
+
+
+    <div class="detail-card">
+
+        <span>
+            PREVIOUS CLOSE
+        </span>
+
+        <strong>
+
+            {% if stock.previous_close is not none %}
+
+                ${{ "%.2f"|format(stock.previous_close) }}
+
+            {% else %}
+
+                —
+
+            {% endif %}
+
+        </strong>
+
+    </div>
+
+
+    <div class="detail-card">
+
+        <span>
+            DAY RANGE
+        </span>
+
+        <strong>
+            {{ stock.day_range }}
+        </strong>
+
+    </div>
+
+
+    <div class="detail-card">
+
+        <span>
+            VOLUME
+        </span>
+
+        <strong>
+            {{ stock.volume }}
+        </strong>
+
+    </div>
+
+
+    <div class="detail-card">
+
+        <span>
+            MARKET CAP
+        </span>
+
+        <strong>
+            {{ stock.market_cap }}
+        </strong>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- CHART -->
+
+<section class="panel">
+
+
+    <div class="panel-header">
+
+
+        <div>
+
+            <span class="eyebrow">
+                PRICE HISTORY
+            </span>
+
+            <h2>
+                30-Day Performance
+            </h2>
+
+        </div>
+
+
+        <span class="panel-badge">
+
+            {{ stock.symbol }}
+
+        </span>
+
+
+    </div>
+
+
+    <div class="chart-container large-chart">
+
+        <canvas id="stockChart"></canvas>
+
+    </div>
+
+
+</section>
+
+
+
+<!-- INFORMATION -->
+
+<div class="content-grid two-column">
+
+
+    <section class="panel">
+
+
+        <div class="panel-header">
+
+            <div>
+
+                <span class="eyebrow">
+                    DATA QUALITY
+                </span>
+
+                <h2>
+                    Market Snapshot
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="data-list">
+
+
+            <div>
+
+                <span>
+                    Data source
+                </span>
+
+                <strong>
+                    Yahoo Finance
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Collected at
+                </span>
+
+                <strong>
+                    {{ stock.scraped_at }}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Symbol
+                </span>
+
+                <strong>
+                    {{ stock.symbol }}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Collection method
+                </span>
+
+                <strong>
+                    Python Web Scraping
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <section class="panel">
+
+
+        <div class="panel-header">
+
+            <div>
+
+                <span class="eyebrow">
+                    PROJECT PIPELINE
+                </span>
+
+                <h2>
+                    How It Works
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="pipeline">
+
+
+            <div class="pipeline-step">
+
+                <span>
+                    01
+                </span>
+
+                <strong>
+                    Request
+                </strong>
+
+                <small>
+                    Fetch webpage
+                </small>
+
+            </div>
+
+
+            <i class="bi bi-arrow-right"></i>
+
+
+            <div class="pipeline-step">
+
+                <span>
+                    02
+                </span>
+
+                <strong>
+                    Parse
+                </strong>
+
+                <small>
+                    BeautifulSoup
+                </small>
+
+            </div>
+
+
+            <i class="bi bi-arrow-right"></i>
+
+
+            <div class="pipeline-step">
+
+                <span>
+                    03
+                </span>
+
+                <strong>
+                    Analyze
+                </strong>
+
+                <small>
+                    Pandas
+                </small>
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+</div>
+
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+
+<script>
+
+
+const historyData =
+    {{ history | tojson }};
+
+
+const labels =
+    historyData.map(
+        item => item.date
+    );
+
+
+const prices =
+    historyData.map(
+        item => item.close
+    );
+
+
+const ctx =
+    document.getElementById(
+        "stockChart"
+    );
+
+
+if (
+    ctx &&
+    prices.length
+) {
+
+
+    new Chart(
+        ctx,
+        {
+
+            type: "line",
+
+            data: {
+
+                labels: labels,
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "{{ stock.symbol }} Price",
+
+                        data:
+                            prices,
+
+                        borderWidth: 3,
+
+                        tension: .35,
+
+                        fill: true,
+
+                        pointRadius: 0,
+
+                        pointHoverRadius: 5
+
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+
+                interaction: {
+
+                    intersect: false,
+
+                    mode: "index"
+
+                },
+
+
+                plugins: {
+
+                    legend: {
+
+                        display: false
+
+                    }
+
+                },
+
+
+                scales: {
+
+                    x: {
+
+                        grid: {
+
+                            display: false
+
+                        }
+
+                    },
+
+
+                    y: {
+
+                        grid: {
+
+                            color:
+                            "rgba(148,163,184,.12)"
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+
+}
+
+
+</script>
+
+
+{% endblock %}
